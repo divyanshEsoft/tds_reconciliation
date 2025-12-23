@@ -1,0 +1,142 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "autoname": "26AS-.FY.-.#####",
+ "creation": "2025-12-19 18:28:21.668206",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "financial_year",
+  "quarter",
+  "file_type",
+  "form_26as_file",
+  "column_break_gozl",
+  "uploaded_by",
+  "upload_date",
+  "amended_from",
+  "section_break_epja",
+  "table_qmbr"
+ ],
+ "fields": [
+  {
+   "fieldname": "financial_year",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Financial Year",
+   "options": "Fiscal Year",
+   "reqd": 1
+  },
+  {
+   "fieldname": "quarter",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "label": "Quarter",
+   "options": "Q1\nQ2\nQ3\nQ4",
+   "reqd": 1
+  },
+  {
+   "fieldname": "column_break_gozl",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "uploaded_by",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Uploaded By",
+   "options": "User",
+   "reqd": 1
+  },
+  {
+   "default": "Today",
+   "fieldname": "upload_date",
+   "fieldtype": "Date",
+   "label": "Upload Date",
+   "read_only": 1,
+   "reqd": 1
+  },
+  {
+   "fieldname": "file_type",
+   "fieldtype": "Select",
+   "label": "File Type",
+   "options": "Excel\nCSV\nPDF\nTXT",
+   "reqd": 1
+  },
+  {
+   "fieldname": "amended_from",
+   "fieldtype": "Link",
+   "label": "Amended From",
+   "no_copy": 1,
+   "options": "TDS 26AS Upload",
+   "print_hide": 1,
+   "read_only": 1,
+   "search_index": 1
+  },
+  {
+   "fieldname": "form_26as_file",
+   "fieldtype": "Attach",
+   "in_list_view": 1,
+   "label": "From 26AS File",
+   "options": "PDF\nCSV\nTXT",
+   "reqd": 1
+  },
+  {
+   "fieldname": "section_break_epja",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "table_qmbr",
+   "fieldtype": "Table",
+   "options": "TDS 26AS Deductor Summary Data"
+  }
+ ],
+ "grid_page_length": 50,
+ "index_web_pages_for_search": 1,
+ "is_submittable": 1,
+ "links": [],
+ "modified": "2025-12-23 11:59:25.269616",
+ "modified_by": "Administrator",
+ "module": "TDS Reconciliation",
+ "name": "TDS 26AS Upload",
+ "naming_rule": "Expression",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Accounts Manager",
+   "share": 1
+  },
+  {
+   "create": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Accounts User",
+   "share": 1
+  }
+ ],
+ "row_format": "Dynamic",
+ "rows_threshold_for_grid_search": 20,
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": [],
+ "track_changes": 1
+}

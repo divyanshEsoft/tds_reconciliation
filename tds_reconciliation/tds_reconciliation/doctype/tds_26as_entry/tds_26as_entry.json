@@ -1,0 +1,77 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2025-12-22 12:23:51.265381",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "financial_year",
+  "upload_reference",
+  "quarter",
+  "section_break_llnd",
+  "table_ukud"
+ ],
+ "fields": [
+  {
+   "fieldname": "upload_reference",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Upload Reference",
+   "options": "TDS 26AS Upload",
+   "reqd": 1
+  },
+  {
+   "fieldname": "financial_year",
+   "fieldtype": "Link",
+   "label": "Financial Year",
+   "options": "Fiscal Year"
+  },
+  {
+   "fieldname": "quarter",
+   "fieldtype": "Select",
+   "label": "Quarter"
+  },
+  {
+   "fieldname": "section_break_llnd",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "table_ukud",
+   "fieldtype": "Table",
+   "options": "TDS 26AS Deductor Summary"
+  }
+ ],
+ "grid_page_length": 50,
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2025-12-22 19:50:10.592323",
+ "modified_by": "Administrator",
+ "module": "TDS Reconciliation",
+ "name": "TDS 26AS Entry",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1
+  },
+  {
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Accounts Manager",
+   "share": 1
+  }
+ ],
+ "row_format": "Dynamic",
+ "rows_threshold_for_grid_search": 20,
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}
