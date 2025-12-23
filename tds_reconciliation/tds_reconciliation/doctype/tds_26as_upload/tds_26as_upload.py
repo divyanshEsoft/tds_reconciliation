@@ -86,10 +86,25 @@ class TDS26ASUpload(Document):
     # --------------------------------------------------
     # CSV
     # --------------------------------------------------
+
+
     def parse_csv(self):
-        with open(self.get_file_path(), newline="", encoding="utf-8") as f:
-            rows = list(csv.reader(f))
+        with open(self.get_file_path(), newline="", encoding="utf-8-sig") as f:
+            reader = csv.DictReader(f)
+
+            rows = []
+            rows.append(reader.fieldnames)  # headers
+
+            for r in reader:
+                rows.append([r.get(h) for h in reader.fieldnames])
+
         self.process_rows(rows)
+
+
+    # def parse_csv(self):
+    #     with open(self.get_file_path(), newline="", encoding="utf-8") as f:
+    #         rows = list(csv.reader(f))
+    #     self.process_rows(rows)
 
     # --------------------------------------------------
     # TXT
