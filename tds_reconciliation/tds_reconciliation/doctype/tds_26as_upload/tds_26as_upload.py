@@ -13,6 +13,23 @@ from openpyxl import load_workbook
 
 class TDS26ASUpload(Document):
 
+
+    def before_validate(self):
+        if self.is_new():
+            self._should_parse = True
+            return
+
+        old_file = frappe.db.get_value(
+            self.doctype,
+            self.name,
+            "form_26as_file"
+        )
+
+        self._should_parse = (old_file != self.form_26as_file)
+
+
+
+
     # --------------------------------------------------
     # VALIDATE
     # --------------------------------------------------
@@ -20,14 +37,15 @@ class TDS26ASUpload(Document):
         if not self.form_26as_file:
             frappe.throw("Please attach Form 26AS file.")
 
-        # Do not re-parse if already parsed
-        if self.table_qmbr:
-            return
+        if not getattr(self, "_should_parse", False):
+            return  # ✅ No file change → do nothing
+
+        # ✅ File changed → reset + parse
+        self.clear()
 
         path = self.get_file_path()
         ext = os.path.splitext(path)[1].lower()
 
-        #  Block deprecated format
         if ext == ".xls":
             frappe.throw(
                 "The .xls (old Excel) format is deprecated.\n"
@@ -58,8 +76,19 @@ class TDS26ASUpload(Document):
     def normalize(self, v):
         return str(v).strip() if v is not None else ""
 
+    # def normalize_header(self, h):
+    #     return str(h).strip().lower()
+
+
     def normalize_header(self, h):
-        return str(h).strip().lower()
+        return (
+            str(h)
+            .strip()
+            .lower()
+            .replace(" / ", "/")
+            .replace("  ", " ")
+        )
+
 
     def clear(self):
         self.set("table_qmbr", [])
@@ -91,13 +120,39 @@ class TDS26ASUpload(Document):
     # --------------------------------------------------
     # TXT
     # --------------------------------------------------
+
+    # def parse_txt(self):
+    #     with open(self.get_file_path(), encoding="utf-8") as f:
+    #         lines = [l.strip() for l in f if l.strip()]
+
+    #     delimiter = "|" if "|" in lines[0] else "\t" if "\t" in lines[0] else ","
+    #     rows = [l.split(delimiter) for l in lines]
+    #     self.process_rows(rows)
+
+
     def parse_txt(self):
         with open(self.get_file_path(), encoding="utf-8") as f:
-            lines = [l.strip() for l in f if l.strip()]
+            lines = [l.rstrip("\n") for l in f if l.strip()]
 
-        delimiter = "|" if "|" in lines[0] else "\t" if "\t" in lines[0] else ","
-        rows = [l.split(delimiter) for l in lines]
+        # Detect delimiter
+        if "|" in lines[0]:
+            delimiter = "|"
+        elif "\t" in lines[0]:
+            delimiter = "\t"
+        else:
+            delimiter = ","
+
+        rows = []
+
+        for line in lines:
+            # IMPORTANT: strip each column individually
+            # cols = [c.strip() for c in line.split(delimiter)]
+            cols = [c.strip() for c in line.split(delimiter) if c.strip()]
+
+            rows.append(cols)
+
         self.process_rows(rows)
+
 
     # --------------------------------------------------
     # PDF - SIMPLIFIED VERSION
@@ -124,7 +179,15 @@ class TDS26ASUpload(Document):
         if pan_match:
             extracted_info['pan'] = pan_match.group(1).strip()
 
-        name_match = re.search(r'Name of Assessee\s*([\w\s]+)', all_text, re.IGNORECASE)
+        # name_match = re.search(r'Name of Assessee\s*([\w\s]+)', all_text, re.IGNORECASE)
+        # if name_match:
+        #     extracted_info['assessee_name'] = name_match.group(1).strip()
+
+        name_match = re.search(
+            r'Name of Assessee\s*([A-Z\s]+?)(?=Address of Assessee|Permanent Account Number|\n)',
+            all_text,
+            re.IGNORECASE
+        )
         if name_match:
             extracted_info['assessee_name'] = name_match.group(1).strip()
 
@@ -311,6 +374,8 @@ class TDS26ASUpload(Document):
             # "tax": col("tax deducted"),  # This will now match ONLY "Tax Deducted", not "Total Tax Deducted"
             # "tds": col("tds deposited"),  # This will now match ONLY "TDS Deposited", not "Total TDS Deposited"
 
+            "address": col("address of assessee"),
+
 
             "amount": col("amount paid", "amount paid/ credited", exclude_total=True),
             "tax": col("tax deducted", exclude_total=True),
@@ -383,6 +448,10 @@ class TDS26ASUpload(Document):
                     elif key == "total_tds":
                         val = value_str.replace(',', '')
                         row_data["total_tds_deposited"] = flt(val) if val else 0.0
+                    
+                    elif key == "address":
+                        row_data["address_of_assessee"] = value_str                    
+
                     # elif key == "amount":
                     #     val = value_str.replace(',', '')
                     #     row_data["amount_paid_credited"] = flt(val) if val else 0.0
