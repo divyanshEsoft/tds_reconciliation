@@ -13,12 +13,12 @@
   "gl_voucher_no",
   "gl_voucher_type",
   "gl_amount",
-  "26as_amount",
+  "as26_amount",
   "difference",
   "column_break_iyzd",
   "match_status",
   "mismatch_reason",
-  "26as_reference",
+  "as26_reference",
   "gl_reference"
  ],
  "fields": [
@@ -58,11 +58,6 @@
    "label": "GL Amount"
   },
   {
-   "fieldname": "26as_amount",
-   "fieldtype": "Currency",
-   "label": "26AS Amount"
-  },
-  {
    "fieldname": "difference",
    "fieldtype": "Currency",
    "label": "Difference"
@@ -83,22 +78,27 @@
    "label": "Mismatch Reason"
   },
   {
-   "fieldname": "26as_reference",
-   "fieldtype": "Link",
-   "label": "26AS Reference",
-   "options": "TDS 26AS Entry"
-  },
-  {
    "fieldname": "gl_reference",
    "fieldtype": "Data",
    "label": "GL Reference"
+  },
+  {
+   "fieldname": "as26_amount",
+   "fieldtype": "Currency",
+   "label": "26AS Amount"
+  },
+  {
+   "fieldname": "as26_reference",
+   "fieldtype": "Link",
+   "label": "AS26 Reference",
+   "options": "TDS 26AS Entry"
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2026-01-05 10:49:40.658241",
+ "modified": "2026-01-05 17:44:41.637733",
  "modified_by": "Administrator",
  "module": "TDS Reconciliation",
  "name": "TDS vs GL Reconciliation Detail",

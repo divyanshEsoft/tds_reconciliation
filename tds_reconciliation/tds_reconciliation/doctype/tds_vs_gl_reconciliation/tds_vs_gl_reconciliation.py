@@ -4,6 +4,7 @@
 import frappe
 from frappe.model.document import Document
 from frappe.utils import flt, add_days
+from collections import defaultdict
 
 
 class TDSVsGLReconciliation(Document):
@@ -33,7 +34,7 @@ class TDSVsGLReconciliation(Document):
         print(f"Company     : {self.company}")
         print(f"Date Range  : {self.from_date} → {self.to_date}")
         print(f"TDS Account : {self.tds_account}")
-        print(f"PAN Filter  : {self.pan or 'None'}")
+        print(f"PAN Filter  : {self.pan or 'ALL'}")
 
         # -----------------------------
         # Clear old rows
@@ -41,63 +42,76 @@ class TDSVsGLReconciliation(Document):
         self.set("tds_vs_gl_reconciliation_detail", [])
 
         # -----------------------------
-        # Fetch 26AS
+        # Fetch 26AS Entries
         # -----------------------------
         tds_rows = self.get_26as_entries()
         print(f"26AS Entries Found : {len(tds_rows)}")
 
         # -----------------------------
-        # Fetch GL (PAN Filter ONLY)
+        # Fetch GL Entries
         # -----------------------------
         gl_rows = self.get_gl_entries()
         print(f"GL Entries Found : {len(gl_rows)}")
 
         # -----------------------------
-        # DEBUG PRINT GL
+        # Group GL by PAN + Date
         # -----------------------------
+        gl_map = defaultdict(list)
         for gl in gl_rows:
-            print(
-                gl["voucher_no"],
-                gl["date"],
-                gl["amount"],
-                gl["customer"],
-                gl["pan"]
-            )
+            key = (gl["pan"], gl["date"])
+            gl_map[key].append(gl)
 
-        # matched indexes
-        matched_gl_indexes = set()
+        used_gl_keys = set()
 
         # =====================================================
-        # MATCH 26AS → GL (PAN + ±5 DAYS)
+        # MATCHING LOGIC
         # =====================================================
-        # Commented for now, focus only on PAN filter
-        """
         print("\n--- MATCHING 26AS → GL (PAN + ±5 DAYS) ---")
 
         for tds in tds_rows:
 
             matched = False
+            matched_gls = []
 
-            for idx, gl in enumerate(gl_rows):
-                if idx in matched_gl_indexes:
+            for (pan, gl_date), gl_list in gl_map.items():
+
+                if pan != tds["pan"]:
                     continue
 
-                if (
-                    tds["pan"]
-                    and gl["pan"]
-                    and tds["pan"] == gl["pan"]
-                    and self.date_within_range(tds["date"], gl["date"], 5)
-                ):
-                    diff = flt(tds["tds"]) - flt(gl["amount"])
-                    status = "Matched" if abs(diff) <= 1 else "Amount Mismatch"
-                    reason = "" if status == "Matched" else f"Difference: {diff:.2f}"
+                if not self.date_within_range(tds["date"], gl_date, 5):
+                    continue
 
-                    self.add_row(tds=tds, gl=gl, status=status, reason=reason)
-                    matched_gl_indexes.add(idx)
+                total_gl_amount = sum(flt(g["amount"]) for g in gl_list)
+
+                diff = flt(tds["tds"]) - total_gl_amount
+
+                if abs(diff) <= 1:
                     matched = True
+                    matched_gls = gl_list
+                    used_gl_keys.add((pan, gl_date))
                     break
 
-            if not matched:
+            if matched:
+                print(
+                    f"MATCH FOUND | PAN {tds['pan']} | "
+                    f"26AS {tds['tds']} | GL SUM {total_gl_amount} | "
+                    f"Date {tds['date']}"
+                )
+
+                for gl in matched_gls:
+                    self.add_row(
+                        tds=tds,
+                        gl=gl,
+                        status="Matched",
+                        reason=""
+                    )
+
+            else:
+                print(
+                    f"NO GL MATCH | PAN {tds['pan']} | "
+                    f"26AS {tds['tds']} | Date {tds['date']}"
+                )
+
                 self.add_row(
                     tds=tds,
                     gl=None,
@@ -105,16 +119,20 @@ class TDSVsGLReconciliation(Document):
                     reason="Present in 26AS but not found in GL"
                 )
 
+        # -----------------------------
         # GL entries missing in 26AS
-        for idx, gl in enumerate(gl_rows):
-            if idx not in matched_gl_indexes:
+        # -----------------------------
+        for (pan, gl_date), gl_list in gl_map.items():
+            if (pan, gl_date) in used_gl_keys:
+                continue
+
+            for gl in gl_list:
                 self.add_row(
                     tds=None,
                     gl=gl,
                     status="Missing in 26AS",
                     reason="Present in GL but not found in 26AS"
                 )
-        """
 
         # -----------------------------
         # Finalize
@@ -123,6 +141,16 @@ class TDSVsGLReconciliation(Document):
         self.save(ignore_permissions=True)
         frappe.db.commit()
 
+        print("\n--- SUMMARY ---")
+        print("26AS Rows  :", len(tds_rows))
+        print("GL Rows    :", len(gl_rows))
+        print("Child Rows:", len(self.tds_vs_gl_reconciliation_detail))
+        print("STATUS    :", self.status)
+
+        print("=" * 70)
+        print("RECONCILIATION COMPLETED")
+        print("=" * 70)
+
         frappe.msgprint(
             f"Reconciliation completed<br>"
             f"26AS Rows: {len(tds_rows)}<br>"
@@ -130,17 +158,14 @@ class TDSVsGLReconciliation(Document):
             f"Status: <b>{self.status}</b>"
         )
 
-        print("RECONCILIATION COMPLETED")
-        print("=" * 70)
-
     # =========================================================
-    # Date tolerance
+    # DATE TOLERANCE
     # =========================================================
     def date_within_range(self, d1, d2, tolerance_days=5):
         return add_days(d1, -tolerance_days) <= d2 <= add_days(d1, tolerance_days)
 
     # =========================================================
-    # Fetch 26AS Entries
+    # FETCH 26AS ENTRIES
     # =========================================================
     def get_26as_entries(self):
 
@@ -175,25 +200,28 @@ class TDSVsGLReconciliation(Document):
         } for d in data]
 
     # =========================================================
-    # Fetch GL Entries (PAN Filter ONLY)
+    # FETCH GL ENTRIES (PROVEN JOIN LOGIC)
     # =========================================================
     def get_gl_entries(self):
 
-        print("\n--- FETCHING GL ENTRIES (PAN ONLY) ---")
-        print("PAN Filter :", self.pan)
+        print("\n--- FETCHING GL ENTRIES ---")
+        print("Company :", self.company)
+        print("Account :", self.tds_account)
+        print("PAN     :", self.pan or "ALL")
 
         rows = frappe.db.sql("""
             SELECT
                 gle.name            AS gl_entry,
-                gle.voucher_no      AS payment_entry,
-                gle.voucher_type,
                 gle.posting_date,
-                gle.debit,
-                gle.credit,
+                gle.voucher_type,
+                gle.voucher_no      AS payment_entry,
 
                 per.reference_name  AS sales_invoice,
                 si.customer,
-                c.pan
+                c.pan,
+
+                gle.debit,
+                gle.credit
 
             FROM `tabGL Entry` gle
 
@@ -213,31 +241,27 @@ class TDSVsGLReconciliation(Document):
             WHERE gle.company = %s
               AND gle.account = %s
               AND gle.is_cancelled = 0
-              AND gle.voucher_type = 'Payment Entry'
-              AND c.pan = %s
+              AND (%s IS NULL OR c.pan = %s)
 
             ORDER BY gle.posting_date, gle.name
         """, (
             self.company,
             self.tds_account,
+            self.pan,
             self.pan
         ), as_dict=True)
 
         print(f"RAW ROWS FETCHED : {len(rows)}")
 
         result = []
-
         for r in rows:
             amount = flt(r.debit) if flt(r.debit) > 0 else flt(r.credit)
 
             print(
                 "GL:", r.gl_entry,
-                "| PE:", r.payment_entry,
-                "| SI:", r.sales_invoice,
-                "| Customer:", r.customer,
+                "| Date:", r.posting_date,
                 "| PAN:", r.pan,
-                "| Amount:", amount,
-                "| Date:", r.posting_date
+                "| Amount:", amount
             )
 
             result.append({
@@ -252,7 +276,7 @@ class TDSVsGLReconciliation(Document):
         return result
 
     # =========================================================
-    # Add Child Row
+    # ADD CHILD ROW
     # =========================================================
     def add_row(self, tds=None, gl=None, status="", reason=""):
 
@@ -264,7 +288,7 @@ class TDSVsGLReconciliation(Document):
             row.deductor_name = tds["name"]
             row.posting_date = tds["date"]
             row.as26_amount = tds["tds"]
-            row.as26_ref = tds["ref"]
+            row.as26_reference = tds["ref"]
 
         if gl:
             row.gl_voucher_no = gl["voucher_no"]
@@ -276,7 +300,7 @@ class TDSVsGLReconciliation(Document):
         row.mismatch_reason = reason
 
     # =========================================================
-    # Parent Status
+    # CALCULATE PARENT STATUS
     # =========================================================
     def calculate_status(self):
 
@@ -292,7 +316,6 @@ class TDSVsGLReconciliation(Document):
                 return
 
         self.status = "Matched"
-
 
 
 
