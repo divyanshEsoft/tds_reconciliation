@@ -1,7 +1,7 @@
 // Copyright (c) 2026, divyansh and contributors
 // For license information, please see license.txt
 
-// frappe.ui.form.on("TDS 26AS Entry", {
+// frappe.ui.form.on("TDS Vs GL Reconciliation", {
 // 	refresh(frm) {
 
 // 	},

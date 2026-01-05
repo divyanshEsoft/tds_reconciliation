@@ -1,0 +1,112 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2026-01-05 10:41:31.139391",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "pan",
+  "tan",
+  "deductor_name",
+  "posting_date",
+  "gl_voucher_no",
+  "gl_voucher_type",
+  "gl_amount",
+  "26as_amount",
+  "difference",
+  "column_break_iyzd",
+  "match_status",
+  "mismatch_reason",
+  "26as_reference",
+  "gl_reference"
+ ],
+ "fields": [
+  {
+   "fieldname": "pan",
+   "fieldtype": "Data",
+   "label": "PAN"
+  },
+  {
+   "fieldname": "tan",
+   "fieldtype": "Data",
+   "label": "TAN"
+  },
+  {
+   "fieldname": "deductor_name",
+   "fieldtype": "Data",
+   "label": "Deductor Name"
+  },
+  {
+   "fieldname": "posting_date",
+   "fieldtype": "Data",
+   "label": "Posting Date"
+  },
+  {
+   "fieldname": "gl_voucher_no",
+   "fieldtype": "Data",
+   "label": "GL Voucher No"
+  },
+  {
+   "fieldname": "gl_voucher_type",
+   "fieldtype": "Data",
+   "label": "GL Voucher Type"
+  },
+  {
+   "fieldname": "gl_amount",
+   "fieldtype": "Currency",
+   "label": "GL Amount"
+  },
+  {
+   "fieldname": "26as_amount",
+   "fieldtype": "Currency",
+   "label": "26AS Amount"
+  },
+  {
+   "fieldname": "difference",
+   "fieldtype": "Currency",
+   "label": "Difference"
+  },
+  {
+   "fieldname": "column_break_iyzd",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "match_status",
+   "fieldtype": "Select",
+   "label": "Match Status",
+   "options": "Matched\nMissing in GL\nMissing in 26AS\nAmount Mismatch"
+  },
+  {
+   "fieldname": "mismatch_reason",
+   "fieldtype": "Small Text",
+   "label": "Mismatch Reason"
+  },
+  {
+   "fieldname": "26as_reference",
+   "fieldtype": "Link",
+   "label": "26AS Reference",
+   "options": "TDS 26AS Entry"
+  },
+  {
+   "fieldname": "gl_reference",
+   "fieldtype": "Data",
+   "label": "GL Reference"
+  }
+ ],
+ "grid_page_length": 50,
+ "index_web_pages_for_search": 1,
+ "istable": 1,
+ "links": [],
+ "modified": "2026-01-05 10:49:40.658241",
+ "modified_by": "Administrator",
+ "module": "TDS Reconciliation",
+ "name": "TDS vs GL Reconciliation Detail",
+ "owner": "Administrator",
+ "permissions": [],
+ "row_format": "Dynamic",
+ "rows_threshold_for_grid_search": 20,
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}

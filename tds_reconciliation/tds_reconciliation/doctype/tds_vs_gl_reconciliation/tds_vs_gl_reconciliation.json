@@ -1,0 +1,152 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "autoname": "TDS-GL-REC-.YYYY.-.#####",
+ "creation": "2026-01-02 19:15:43.075271",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "section_break_eid9",
+  "amended_from",
+  "company",
+  "financial_year",
+  "from_date",
+  "to_date",
+  "tds_account",
+  "column_break_qbxy",
+  "pan",
+  "tan",
+  "party_type",
+  "party",
+  "status",
+  "generate_reconciliation",
+  "reconciliation_details_section",
+  "tds_vs_gl_reconciliation_detail"
+ ],
+ "fields": [
+  {
+   "fieldname": "section_break_eid9",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "amended_from",
+   "fieldtype": "Link",
+   "label": "Amended From",
+   "no_copy": 1,
+   "options": "TDS Vs GL Reconciliation",
+   "print_hide": 1,
+   "read_only": 1,
+   "search_index": 1
+  },
+  {
+   "fieldname": "company",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Company",
+   "options": "Company",
+   "reqd": 1
+  },
+  {
+   "fieldname": "financial_year",
+   "fieldtype": "Link",
+   "label": "Financial Year",
+   "options": "Fiscal Year"
+  },
+  {
+   "fieldname": "from_date",
+   "fieldtype": "Date",
+   "label": "From Date"
+  },
+  {
+   "fieldname": "to_date",
+   "fieldtype": "Date",
+   "label": "To Date"
+  },
+  {
+   "fieldname": "column_break_qbxy",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "tds_account",
+   "fieldtype": "Link",
+   "label": "TDS Account",
+   "options": "Account"
+  },
+  {
+   "fieldname": "pan",
+   "fieldtype": "Data",
+   "label": "PAN"
+  },
+  {
+   "fieldname": "tan",
+   "fieldtype": "Data",
+   "label": "TAN"
+  },
+  {
+   "fieldname": "party_type",
+   "fieldtype": "Select",
+   "label": "Party Type",
+   "options": "Supplier\nCustomer"
+  },
+  {
+   "fieldname": "status",
+   "fieldtype": "Select",
+   "label": "Status",
+   "options": "Draft\nMatched\nMismatch",
+   "read_only": 1
+  },
+  {
+   "description": "Dynamic Link\n\nBased on Party Type",
+   "fieldname": "party",
+   "fieldtype": "Data",
+   "label": "Party"
+  },
+  {
+   "fieldname": "generate_reconciliation",
+   "fieldtype": "Button",
+   "label": "Generate Reconciliation"
+  },
+  {
+   "fieldname": "reconciliation_details_section",
+   "fieldtype": "Section Break",
+   "label": "Reconciliation Details"
+  },
+  {
+   "fieldname": "tds_vs_gl_reconciliation_detail",
+   "fieldtype": "Table",
+   "label": "TDS vs GL Reconciliation Detail",
+   "options": "TDS vs GL Reconciliation Detail"
+  }
+ ],
+ "grid_page_length": 50,
+ "index_web_pages_for_search": 1,
+ "is_submittable": 1,
+ "links": [],
+ "modified": "2026-01-05 11:10:47.741092",
+ "modified_by": "Administrator",
+ "module": "TDS Reconciliation",
+ "name": "TDS Vs GL Reconciliation",
+ "naming_rule": "Expression",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "submit": 1,
+   "write": 1
+  }
+ ],
+ "row_format": "Dynamic",
+ "rows_threshold_for_grid_search": 20,
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": [],
+ "track_changes": 1
+}

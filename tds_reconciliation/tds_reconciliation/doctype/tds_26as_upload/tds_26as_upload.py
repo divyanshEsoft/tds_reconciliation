@@ -29,7 +29,6 @@ class TDS26ASUpload(Document):
 
 
 
-
     # --------------------------------------------------
     # VALIDATE
     # --------------------------------------------------
@@ -120,14 +119,6 @@ class TDS26ASUpload(Document):
     # --------------------------------------------------
     # TXT
     # --------------------------------------------------
-
-    # def parse_txt(self):
-    #     with open(self.get_file_path(), encoding="utf-8") as f:
-    #         lines = [l.strip() for l in f if l.strip()]
-
-    #     delimiter = "|" if "|" in lines[0] else "\t" if "\t" in lines[0] else ","
-    #     rows = [l.split(delimiter) for l in lines]
-    #     self.process_rows(rows)
 
 
     def parse_txt(self):
@@ -561,6 +552,7 @@ class TDS26ASUpload(Document):
 
         return None
 
+    
     def is_valid_date(self, date_str):
         if not date_str:
             return False
@@ -569,3 +561,117 @@ class TDS26ASUpload(Document):
             return True
         except ValueError:
             return False
+        
+
+
+    def compare_with_other_tax(self, other_docname):
+        other_doc = frappe.get_doc("OtherTaxDoctype", other_docname)
+
+        # Clear old mismatches for this upload
+        frappe.db.delete(
+            "TDS26ASData",
+            {"reference_26as": self.name}
+        )
+
+        # Build lookup for Other Tax file
+        other_map = {}
+
+        for row in other_doc.table_other_tax:
+            key = (
+                row.pan,
+                row.tan,
+                row.section,
+                row.transaction_date
+            )
+            other_map[key] = row
+
+        # Compare with 26AS rows
+        for row in self.table_qmbr:
+            key = (
+                row.permanent_account_number_pan,
+                row.tan_of_deductor,
+                row.section,
+                row.transaction_date
+            )
+
+            other_row = other_map.get(key)
+
+            if not other_row:
+                self.create_mismatch(
+                    row, None, "Missing in Other File"
+                )
+                continue
+
+            # Amount mismatch
+            if flt(row.amount_paid_credited) != flt(other_row.amount):
+                self.create_mismatch(
+                    row, other_row, "Amount Mismatch"
+                )
+
+            # TDS mismatch
+            if flt(row.tds_deposited) != flt(other_row.tds):
+                self.create_mismatch(
+                    row, other_row, "TDS Mismatch"
+                )
+
+        # Check rows present in Other file but missing in 26AS
+        self_keys = {
+            (
+                r.permanent_account_number_pan,
+                r.tan_of_deductor,
+                r.section,
+                r.transaction_date
+            )
+            for r in self.table_qmbr
+        }
+
+        for key, other_row in other_map.items():
+            if key not in self_keys:
+                self.create_mismatch(
+                    None, other_row, "Missing in 26AS"
+                )
+    
+
+
+#------------------------------------------------------------------
+
+#  creatin Entry in the TDS 26AS Entry 
+
+#------------------------------------------------------------------
+
+    def on_submit(self):
+        self.create_26as_entries()
+
+
+
+    def create_26as_entries(self):
+        # Remove old entries if re-uploaded
+        frappe.db.delete(
+            "TDS 26AS Entry",
+            {"upload_ref": self.name}
+        )
+
+        for row in self.table_qmbr:
+            frappe.get_doc({
+                "doctype": "TDS 26AS Entry",
+                "upload_ref": self.name,
+
+                "pan": row.permanent_account_number_pan,
+                "tan": row.tan_of_deductor,
+                "deductor_name": row.name_of_deductor,
+                "assessee_name": row.name_of_assessee,
+
+                "section": row.section,
+                "transaction_date": row.transaction_date,
+                "booking_date": row.date_of_booking,
+
+                "amount_paid": row.amount_paid_credited,
+                "tax_deducted": row.tax_deducted,
+                "tds_deposited": row.tds_deposited,
+
+                "financial_year": row.financial_year,
+                "assessment_year": row.assessment_year,
+
+                "status": "Unprocessed",
+                "matched": 0
+            }).insert(ignore_permissions=True)

@@ -1,72 +1,141 @@
 {
  "actions": [],
  "allow_rename": 1,
- "creation": "2025-12-22 12:23:51.265381",
+ "autoname": "26AS Entry-.FY.-.quarter-.#####",
+ "creation": "2026-01-02 11:41:51.028848",
  "doctype": "DocType",
  "engine": "InnoDB",
  "field_order": [
+  "upload_ref",
+  "pan",
+  "tan",
+  "deductor_name",
+  "assessee_name",
+  "section",
+  "transaction_date",
+  "booking_date",
+  "column_break_mcbv",
+  "amount_paid",
+  "tax_deducted",
+  "tds_deposited",
   "financial_year",
-  "upload_reference",
-  "quarter",
-  "section_break_llnd",
-  "table_ukud"
+  "assessment_year",
+  "status",
+  "matched",
+  "remarks"
  ],
  "fields": [
   {
-   "fieldname": "upload_reference",
+   "fieldname": "upload_ref",
    "fieldtype": "Link",
    "in_list_view": 1,
-   "label": "Upload Reference",
+   "label": "Upload Ref",
    "options": "TDS 26AS Upload",
    "reqd": 1
   },
   {
+   "fieldname": "pan",
+   "fieldtype": "Data",
+   "label": "PAN"
+  },
+  {
+   "fieldname": "tan",
+   "fieldtype": "Data",
+   "label": "TAN"
+  },
+  {
+   "fieldname": "deductor_name",
+   "fieldtype": "Data",
+   "label": "Deductor Name"
+  },
+  {
+   "fieldname": "assessee_name",
+   "fieldtype": "Data",
+   "label": "Assessee Name"
+  },
+  {
+   "fieldname": "section",
+   "fieldtype": "Data",
+   "label": "Section"
+  },
+  {
+   "fieldname": "transaction_date",
+   "fieldtype": "Date",
+   "label": "Transaction Date"
+  },
+  {
+   "fieldname": "booking_date",
+   "fieldtype": "Date",
+   "label": "Booking Date"
+  },
+  {
+   "fieldname": "column_break_mcbv",
+   "fieldtype": "Column Break",
+   "options": "Unprocessed\nMatched\nMismatch\nMissing in ERP"
+  },
+  {
+   "fieldname": "amount_paid",
+   "fieldtype": "Currency",
+   "label": "Amount Paid"
+  },
+  {
+   "fieldname": "tax_deducted",
+   "fieldtype": "Currency",
+   "label": "Tax Deducted"
+  },
+  {
+   "fieldname": "tds_deposited",
+   "fieldtype": "Currency",
+   "label": "Tds Deposited"
+  },
+  {
    "fieldname": "financial_year",
-   "fieldtype": "Link",
-   "label": "Financial Year",
-   "options": "Fiscal Year"
+   "fieldtype": "Data",
+   "label": "Financial Year"
   },
   {
-   "fieldname": "quarter",
+   "fieldname": "assessment_year",
+   "fieldtype": "Data",
+   "label": "Assessment Year"
+  },
+  {
+   "fieldname": "status",
    "fieldtype": "Select",
-   "label": "Quarter"
+   "label": "Status"
   },
   {
-   "fieldname": "section_break_llnd",
-   "fieldtype": "Section Break"
+   "default": "0",
+   "fieldname": "matched",
+   "fieldtype": "Check",
+   "label": "Matched"
   },
   {
-   "fieldname": "table_ukud",
-   "fieldtype": "Table",
-   "options": "TDS 26AS Deductor Summary"
+   "fieldname": "remarks",
+   "fieldtype": "Small Text",
+   "label": "Remarks"
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-12-22 19:50:10.592323",
+ "modified": "2026-01-02 12:34:26.962042",
  "modified_by": "Administrator",
  "module": "TDS Reconciliation",
  "name": "TDS 26AS Entry",
+ "naming_rule": "Expression",
  "owner": "Administrator",
  "permissions": [
   {
+   "create": 1,
+   "delete": 1,
    "email": 1,
    "export": 1,
    "print": 1,
    "read": 1,
    "report": 1,
    "role": "System Manager",
-   "share": 1
-  },
-  {
-   "email": 1,
-   "export": 1,
-   "print": 1,
-   "read": 1,
-   "report": 1,
-   "role": "Accounts Manager",
-   "share": 1
+   "share": 1,
+   "write": 1
   }
  ],
  "row_format": "Dynamic",

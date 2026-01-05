@@ -5,5 +5,5 @@
 from frappe.tests.utils import FrappeTestCase
 
 
-class TestTDS26ASEntry(FrappeTestCase):
+class TestTDSVsGLReconciliation(FrappeTestCase):
 	pass

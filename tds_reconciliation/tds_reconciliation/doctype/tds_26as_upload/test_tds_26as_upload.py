@@ -6,4 +6,5 @@ from frappe.tests.utils import FrappeTestCase
 
 
 class TestTDS26ASUpload(FrappeTestCase):
-	pass
+    def test_tds_26as_uploaded_correctly(self):
+        pass

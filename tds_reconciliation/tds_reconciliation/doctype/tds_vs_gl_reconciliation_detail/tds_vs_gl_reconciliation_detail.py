@@ -5,5 +5,5 @@
 from frappe.model.document import Document
 
 
-class TDS26ASEntry(Document):
+class TDSvsGLReconciliationDetail(Document):
 	pass
