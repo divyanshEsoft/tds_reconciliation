@@ -167,10 +167,45 @@ class TDSVsGLReconciliation(Document):
     # =========================================================
     # FETCH 26AS ENTRIES
     # =========================================================
+  
+    # def get_26as_entries(self):
+
+    #     filters = {
+    #         "transaction_date": ["between", [self.from_date, self.to_date]]
+    #     }
+
+    #     if self.pan:
+    #         filters["pan"] = self.pan
+
+    #     data = frappe.get_all(
+    #         "TDS 26AS Entry",
+    #         filters=filters,
+    #         fields=[
+    #             "name",
+    #             "pan",
+    #             "tan",
+    #             "deductor_name",
+    #             "transaction_date",
+    #             "tds_deposited"
+    #         ],
+    #         order_by="transaction_date"
+    #     )
+
+    #     return [{
+    #         "ref": d.name,
+    #         "pan": (d.pan or "").strip(),
+    #         "tan": (d.tan or "").strip(),
+    #         "name": d.deductor_name,
+    #         "date": d.transaction_date,
+    #         "tds": flt(d.tds_deposited)
+    #     } for d in data]
+
+
     def get_26as_entries(self):
 
         filters = {
-            "transaction_date": ["between", [self.from_date, self.to_date]]
+            "transaction_date": ["between", [self.from_date, self.to_date]],
+            "tds_deposited": [">", 0]   # 🔥 CRITICAL FIX
         }
 
         if self.pan:
@@ -190,6 +225,10 @@ class TDSVsGLReconciliation(Document):
             order_by="transaction_date"
         )
 
+        print("\n--- VALID 26AS ROWS (TDS > 0) ---")
+        for d in data:
+            print(d.name, d.pan, d.transaction_date, d.tds_deposited)
+
         return [{
             "ref": d.name,
             "pan": (d.pan or "").strip(),
@@ -198,6 +237,8 @@ class TDSVsGLReconciliation(Document):
             "date": d.transaction_date,
             "tds": flt(d.tds_deposited)
         } for d in data]
+
+
 
     # =========================================================
     # FETCH GL ENTRIES (PROVEN JOIN LOGIC)
