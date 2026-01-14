@@ -1,7 +1,7 @@
 {
  "actions": [],
  "allow_rename": 1,
- "autoname": "26AS Entry-.FY.-.quarter-.#####",
+ "autoname": "26AS Entry-.FY.-.#####",
  "creation": "2026-01-02 11:41:51.028848",
  "doctype": "DocType",
  "engine": "InnoDB",
@@ -118,7 +118,7 @@
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2026-01-02 12:34:26.962042",
+ "modified": "2026-01-08 13:55:08.235396",
  "modified_by": "Administrator",
  "module": "TDS Reconciliation",
  "name": "TDS 26AS Entry",

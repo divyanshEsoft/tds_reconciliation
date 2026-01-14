@@ -28,10 +28,10 @@
   {
    "fieldname": "quarter",
    "fieldtype": "Select",
+   "hidden": 1,
    "in_list_view": 1,
    "label": "Quarter",
-   "options": "Q1\nQ2\nQ3\nQ4",
-   "reqd": 1
+   "options": "Q1\nQ2\nQ3\nQ4"
   },
   {
    "fieldname": "column_break_gozl",
@@ -85,7 +85,7 @@
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2025-12-23 15:04:32.601947",
+ "modified": "2026-01-08 13:54:00.110235",
  "modified_by": "Administrator",
  "module": "TDS Reconciliation",
  "name": "TDS 26AS Upload",
